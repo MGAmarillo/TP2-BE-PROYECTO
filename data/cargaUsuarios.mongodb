@@ -1,0 +1,28 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('gym_meetings');
+
+// The drop() command destroys all data from a collection.
+// Make sure you run it against the correct database and collection.
+db.usuarios.drop();
+
+// Insert a few documents into the sales collection.
+db.usuarios.insertOne([
+  {nombre:'Mateo', 
+  apellido: 'Amarillo', 
+  mail:'mateo.amarillo50@gmail.com' , 
+  dni: 41779897 , 
+  telefono: 1151799108 , 
+  nacimiento: '06/04/1999', 
+  password: 'amarillo' ,
+  alumno: false ,
+  profesor: true ,
+  deportes:['futbol', 'crossfit', 'running'],
+  clases:[],
+  administrador: true 
+  }
+  ]);
