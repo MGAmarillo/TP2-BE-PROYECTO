@@ -8,6 +8,10 @@ router.get('/', async(req, res) => {
     res.json(await controller.getDeportes());
 })
 
+router.get('/:nombre', async(req,res) =>{
+    res.json(await controller.getDeportesPorNombre(req.params.nombre))
+});
+
 router.post('/api/deporte', (req, res) => {
     listaDeportes.push(req.body);
     res.json(req.body);
