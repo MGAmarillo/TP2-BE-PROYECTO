@@ -12,19 +12,13 @@ router.get('/:nombre', async(req,res) =>{
     res.json(await controller.getDeportesPorNombre(req.params.nombre))
 });
 
-router.post('/api/deporte', (req, res) => {
-    listaDeportes.push(req.body);
-    res.json(req.body);
-})
+router.post('/', async (req, res)=>{
+    const result = await controller.insertDeporte(req.body);
+    res.json(result);
+});
 
-router.delete('/api/deporte/:nombre', (req, res) => {
-    console.log(req.params.nombre);
-    res.json({ ope: "ok" });
-})
-
-router.put('/api/deporte/:nombre', (req, res) => {
-    listaDeportes.push(req.body);
-    res.json({ope:"ok"});
+router.delete('/:nombre', async(req,res) => {
+    res.json(await controller.deleteDeporte(req.params.nombre))
 })
 
 module.exports = router;

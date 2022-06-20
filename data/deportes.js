@@ -13,4 +13,24 @@ async function getAllDeportes(){
     return deportes;
 }
 
-module.exports = {getAllDeportes}
+async function agregarDeporte(deporte){
+    const clientmongo = await conn.getConnection();
+    const result = await clientmongo
+        .db(DATABASE)
+        .collection(DEPORTES)
+        .insertOne(deporte);
+    return result;
+}
+
+async function eliminarDeporte(deporte){
+    const clientmongo = await conn.getConnection();
+    const result = await clientmongo
+        .db(DATABASE)
+        .collection(DEPORTES)
+        .deleteOne(deporte);
+    return result;
+}
+
+
+
+module.exports = {getAllDeportes,agregarDeporte,eliminarDeporte}
