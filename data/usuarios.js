@@ -26,6 +26,18 @@ async function addUser(user){
     return user;
 }
 
+async function getAlumnos(){
+    const users = await getAllUsuarios();
+    const alumnos = users.filter(user => user.alumno === true);
+    return alumnos;
+}
+
+async function getProfesores(){
+    const users = await getAllUsuarios();
+    const profesores = users.filter(user => user.profesor === true);
+    return profesores;
+}
+
 async function findByCredential(mail, password){
     const connectiondb = await connection.getConnection();
     const user = await  connectiondb
@@ -50,4 +62,4 @@ function generatedToken(user){
     return token;
 }
 
-module.exports = {getAllUsuarios, addUser, findByCredential, generatedToken}
+module.exports = {getAllUsuarios, addUser, findByCredential, generatedToken, getAlumnos, getProfesores}

@@ -23,6 +23,14 @@ router.post('/login', async (req,res) => {
   } catch (error){
       res.status(401).send(error.message);
   }
+});
+
+router.get('/alumnos', async (req, res) => {
+  res.json(await usersController.getAlumnos());
+})
+
+router.get('/profesores', async (req, res) => {
+  res.json(await usersController.getProfesores());
 })
 
 module.exports = router;
