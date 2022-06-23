@@ -1,3 +1,4 @@
+
 const data = require('../data/profesores');
 const data2 = require('../data/clases');
 
@@ -14,4 +15,8 @@ async function altaClase(clase, id){
     data2.addClase(clase, id);
 }
 
-module.exports = {getProfesores, addProfesor, altaClase}
+async function getProfesorById(profesorId) {
+    return data.getProfesorById();
+}
+
+module.exports = {getProfesores, addProfesor, altaClase, getProfesorById}

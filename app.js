@@ -1,16 +1,33 @@
 var createError = require('http-errors');
 var express = require('express');
+var cors = require('cors');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 const deportesRouter = require('./routes/deportes');
 const clasesRouter = require('./routes/clases')
 const profesoresRouter = require('./routes/profesores')
+const alumnosRouter = require('./routes/alumnos');
+
 
 var app = express();
+
+// Enable CORS setup
+const allowedOrigins = ['http://localhost:3000']
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+app.use(cors(corsOptions));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +44,8 @@ app.use('/api/users', usersRouter);
 app.use('/api/deportes', deportesRouter);
 app.use('/api/clases', clasesRouter);
 app.use('/api/profesores', profesoresRouter)
+app.use('/api/alumnos', alumnosRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

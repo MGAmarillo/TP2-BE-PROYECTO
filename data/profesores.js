@@ -6,6 +6,7 @@ const DATABASE = 'gym_meetings';
 const PROFESORES = 'profesores';
 const objectId = require('mongodb').ObjectId;
 
+
 async function getProfesores(){
     const connectiondb = await connection.getConnection();
     const profes = await connectiondb
@@ -16,6 +17,16 @@ async function getProfesores(){
     return profes;
 }
 
+async function getProfesorById(profesorId) {
+    const connectiondb = await conn.getConnection();
+    const query = {_id: new objectId(profesorId)};
+    const profesor = await connectiondb
+                        .db(DATABASE)
+                        .collection(PROFESORES)
+                        .find(query)
+                        .toArray();
+     return profesor;
+}
 async function addProfesor(profesor){
     const connectiondb = await connection.getConnection();
     profesor.password = await bcrypt.hash(profesor.password, 8);
@@ -58,4 +69,5 @@ function generatedToken(prof){
     return token;
 }
 
-module.exports = {addProfesor, findByCredential, generatedToken, getProfesores}
+module.exports = {addProfesor, findByCredential, generatedToken, getProfesores, getProfesorById}
+
