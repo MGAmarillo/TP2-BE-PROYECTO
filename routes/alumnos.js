@@ -8,8 +8,8 @@ router.get('/', async(req, res) => {
   res.json(await controller.getAllAlumnos());
 })
 
-router.get('/:mail', async(req, res) => {
-  res.json(await controller.getAlumnoPorMail(req.params.mail));
+router.get('/:id', async(req, res) => {
+  res.json(await controller.getAlumnoPorId(req.params));
 })
 
 router.post('/', async (req, res)=>{
@@ -33,6 +33,10 @@ router.post('/login', async (req,res) => {
   } catch (error){
       res.status(401).send(error.message);
   }
+});
+
+router.post('/anotarseClase/:idAlumno', async (req, res) => {
+  res.json(await controller.anotarseAClase(req.body.clase_id, req.params.idAlumno));
 });
 
 module.exports = router;

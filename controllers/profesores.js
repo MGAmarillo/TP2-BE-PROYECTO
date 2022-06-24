@@ -12,9 +12,7 @@ async function addProfesor(profesor){
 
 async function altaClase(clase, id){
     const prof = await getProfesorById(id);
-    console.log(prof);
     let clasesProf = prof.clases;
-    console.log(clasesProf);
     clasesProf.push(clase);
     dataProf.altaClase(clase, id, clasesProf);
     dataClases.addClase(clase, id);

@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { ObjectId } = require('mongodb');
 const connection = require('./connection');
 const profesores = require('./profesores')
 const DATABASE = 'gym_meetings';
@@ -13,6 +14,15 @@ async function getClases(){
                             .find()
                             .toArray();
     return clases;
+}
+
+async function getClasePorId(id){
+    const connectiondb = await connection.getConnection();
+    const clase = await connectiondb
+                            .db(DATABASE)
+                            .collection(CLASES)
+                            .findOne({_id: new ObjectId(id)});
+    return clase;
 }
 
 async function getClasesPorDeporte(deporte){
@@ -36,4 +46,14 @@ async function addClase(clase){
     return clase;
 }
 
-module.exports = {getClases, getClasesPorDeporte, getClasesPorProfesor, addClase}
+async function registrarAlumno(idClase, idAlumno, alumnosPorClase){
+    console.log(idClase);
+    const connectiondb = await connection.getConnection();
+    const result = await connectiondb
+                        .db(DATABASE)
+                        .collection(CLASES)
+                        .updateOne({_id: new ObjectId(idClase)}, {$set: {alumnos: alumnosPorClase}});
+    return result;
+}
+
+module.exports = {getClases, getClasesPorDeporte, getClasesPorProfesor, addClase, getClasePorId, registrarAlumno}

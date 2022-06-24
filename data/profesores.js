@@ -38,7 +38,6 @@ async function addProfesor(profesor){
 
 async function altaClase(clase, id, clasesProf){
     const connectiondb = await connection.getConnection();
-    const profe = await getProfesorById(id);
     const result = await connectiondb
                             .db(DATABASE)
                             .collection(PROFESORES)

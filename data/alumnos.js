@@ -2,6 +2,7 @@ require('dotenv').config();
 const conn = require('./connection');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { ObjectId } = require('mongodb');
 const DATABASE = 'gym_meetings';
 const ALUMNOS = 'alumnos';
 const objectId = require('mongodb').ObjectId;
@@ -14,6 +15,15 @@ async function getAllAlumnos(){
                         .find()
                         .toArray();
     return alumnos;
+}
+
+async function getAlumnoPorId(id){
+    const connectiondb = await conn.getConnection();
+    const alumno = await connectiondb 
+                        .db(DATABASE)
+                        .collection(ALUMNOS)
+                        .findOne({_id: new ObjectId(id)});
+    return alumno;
 }
 
 async function agregarAlumno(alumno){
@@ -44,6 +54,15 @@ async function agregarAlumno(alumno){
     return result;
  }
 
+ async function anotarseAClase(idClase, idAlumno, clasesAlumno){
+    const connectiondb = await conn.getConnection();
+    const result = await connectiondb
+                        .db(DATABASE)
+                        .collection(ALUMNOS)
+                        .updateOne({_id: new ObjectId(idAlumno)}, {$set: {clases: clasesAlumno}});
+    return result;
+ }
+
  async function findByCredential(mail, password){
     const connectiondb = await conn.getConnection();
     const alu = await  connectiondb
@@ -69,4 +88,4 @@ function generatedToken(alu){
 } 
 
 
-module.exports = {generatedToken, findByCredential, getAllAlumnos, agregarAlumno, eliminarAlumno, modificarAlumno}
+module.exports = {generatedToken, findByCredential, getAllAlumnos, agregarAlumno, eliminarAlumno, modificarAlumno, getAlumnoPorId, anotarseAClase}

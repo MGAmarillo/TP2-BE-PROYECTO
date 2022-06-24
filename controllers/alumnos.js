@@ -1,13 +1,13 @@
-const alumnos = require('../data/alumnos');
+const dataAlumnos = require('../data/alumnos');
+const dataClases = require('../data/clases');
 const bcrypt = require('bcrypt')
 
 async function getAllAlumnos() {
-    return alumnos.getAllAlumnos();
+    return dataAlumnos.getAllAlumnos();
 }
 
-async function getAlumnoPorMail(mail){
-    let alumnos = await getAllAlumnos();
-    return alumnos.find(alumno => alumno.mail == mail);
+async function getAlumnoPorId(id){
+    return dataAlumnos.getAlumnoPorId(id);
 }
 
 async function agregarAlumno(alumno){
@@ -15,7 +15,7 @@ async function agregarAlumno(alumno){
     let nacimiento = new Date(alumno.nacimiento);
     alumno.password = password;
     alumno.nacimiento = nacimiento;
-    return alumnos.agregarAlumno(alumno);
+    return dataAlumnos.agregarAlumno(alumno);
     
 }
 
@@ -23,19 +23,30 @@ async function eliminarAlumno(mail){
     let alumnoEncontrado = await getAlumnoPorMail(mail);
 
     if(alumnoEncontrado != undefined){
-        return alumnos.eliminarAlumno(alumnoEncontrado);
+        return dataAlumnos.eliminarAlumno(alumnoEncontrado);
     }
     else{
-        console.log("El alumno ha eliminar, no ha sido encontrado")
+        console.log("El alumno a eliminar, no ha sido encontrado")
     }
 }
 
 async function modificarAlumno(mail, alumno){
     let nacimiento = new Date(alumno.nacimiento);
     alumno.nacimiento = nacimiento;
-    return alumnos.modificarAlumno(mail, alumno);
+    return dataAlumnos.modificarAlumno(mail, alumno);
 }
 
+async function anotarseAClase(idClase, idAlumno){
+    const alu = await dataAlumnos.getAlumnoPorId(idAlumno);
+    let clasesAlumno = alu.clases;
+    clasesAlumno.push(idClase);
+    dataAlumnos.anotarseAClase(idClase, idAlumno, clasesAlumno);
 
+    const clas = await dataClases.getClasePorId(idClase);
+    let alumnosPorClase = clas.alumnos;
+    alumnosPorClase.push(idAlumno);
+    console.log(alumnosPorClase);
+    dataClases.registrarAlumno(idClase, idAlumno, alumnosPorClase);
+}
 
-module.exports = {getAllAlumnos, getAlumnoPorMail, agregarAlumno, eliminarAlumno, modificarAlumno}
+module.exports = {getAllAlumnos, getAlumnoPorId, agregarAlumno, eliminarAlumno, modificarAlumno, anotarseAClase}
