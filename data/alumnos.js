@@ -1,4 +1,7 @@
+require('dotenv').config();
 const conn = require('./connection');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const DATABASE = 'gym_meetings';
 const ALUMNOS = 'alumnos';
 const objectId = require('mongodb').ObjectId;
@@ -41,7 +44,29 @@ async function agregarAlumno(alumno){
     return result;
  }
 
- 
+ async function findByCredential(mail, password){
+    const connectiondb = await conn.getConnection();
+    const alu = await  connectiondb
+                            .db(DATABASE)
+                            .collection(ALUMNOS)
+                            .findOne({mail: mail});
+    if(!alu){
+        throw new Error('Usuario o contraseña incorrectos');
+    }
+    
+    const isMatch = await bcrypt.compare(password, alu.password);
+
+    if(!isMatch){
+        throw new Error('Usuario o contraseña incorrectos');
+    }
+
+    return alu;
+}
+
+function generatedToken(alu){
+    const token = jwt.sign({_id: alu._id, mail: alu.mail}, process.env.CLAVE_SECRETA, {expiresIn: "2h"});
+    return token;
+} 
 
 
-module.exports = {getAllAlumnos, agregarAlumno, eliminarAlumno, modificarAlumno}
+module.exports = {generatedToken, findByCredential, getAllAlumnos, agregarAlumno, eliminarAlumno, modificarAlumno}

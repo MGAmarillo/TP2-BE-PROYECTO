@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/alumnos');
+const data = require('./../data/alumnos');
 
 /* GET users listing. */
 router.get('/', async(req, res) => {
@@ -23,5 +24,15 @@ router.delete('/:mail', async(req, res) => {
 router.put('/:mail', async(req, res) => {
   res.json(await controller.modificarAlumno(req.params.mail,req.body))
 })
+
+router.post('/login', async (req,res) => {
+  try {
+    const alu = await data.findByCredential(req.body.mail, req.body.password);
+    const token = data.generatedToken(alu);
+    res.send({alu, token});
+  } catch (error){
+      res.status(401).send(error.message);
+  }
+});
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const alumnos = require('../data/alumnos');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 
 async function getAllAlumnos() {
     return alumnos.getAllAlumnos();

@@ -29,13 +29,10 @@ async function getClasesPorProfesor(profesor){
 
 async function addClase(clase){
     const connectiondb = await connection.getConnection();
-    const idProf = clase.profesor_id;
     const clases = await  connectiondb
                             .db(DATABASE)
                             .collection(CLASES)
-                            .insertOne(clase);
-    const profesor = await profesores.getPorId(idProf);  
-    const profActualizado = await profesor.agregarClase(clase);                      
+                            .insertOne(clase);                      
     return clase;
 }
 

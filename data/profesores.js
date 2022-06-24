@@ -18,13 +18,12 @@ async function getProfesores(){
 }
 
 async function getProfesorById(profesorId) {
-    const connectiondb = await conn.getConnection();
+    const connectiondb = await connection.getConnection();
     const query = {_id: new objectId(profesorId)};
     const profesor = await connectiondb
                         .db(DATABASE)
                         .collection(PROFESORES)
-                        .find(query)
-                        .toArray();
+                        .findOne(query);
      return profesor;
 }
 async function addProfesor(profesor){
@@ -37,12 +36,14 @@ async function addProfesor(profesor){
     return profesor;
 }
 
-async function altaClase(clase){
+async function altaClase(clase, id, clasesProf){
     const connectiondb = await connection.getConnection();
-    const profes = await connectiondb
+    const profe = await getProfesorById(id);
+    const result = await connectiondb
                             .db(DATABASE)
                             .collection(PROFESORES)
-    
+                            .updateOne({_id: new objectId(id)}, {$set: {clases: clasesProf}});
+    return result;
 }
 
 async function findByCredential(mail, password){
@@ -69,5 +70,5 @@ function generatedToken(prof){
     return token;
 }
 
-module.exports = {addProfesor, findByCredential, generatedToken, getProfesores, getProfesorById}
+module.exports = {addProfesor, findByCredential, generatedToken, getProfesores, getProfesorById, altaClase}
 

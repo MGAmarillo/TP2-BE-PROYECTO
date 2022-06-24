@@ -1,22 +1,27 @@
 
-const data = require('../data/profesores');
-const data2 = require('../data/clases');
+const dataProf = require('../data/profesores');
+const dataClases = require('../data/clases');
 
 async function getProfesores() {
-    return data.getProfesores();
+    return dataProf.getProfesores();
 }
 
 async function addProfesor(profesor){
-    return data.addProfesor(profesor);
+    return dataProf.addProfesor(profesor);
 }
 
 async function altaClase(clase, id){
-    data.altaClase(clase, id);
-    data2.addClase(clase, id);
+    const prof = await getProfesorById(id);
+    console.log(prof);
+    let clasesProf = prof.clases;
+    console.log(clasesProf);
+    clasesProf.push(clase);
+    dataProf.altaClase(clase, id, clasesProf);
+    dataClases.addClase(clase, id);
 }
 
-async function getProfesorById(profesorId) {
-    return data.getProfesorById();
+async function getProfesorById(id) {
+    return dataProf.getProfesorById(id);
 }
 
 module.exports = {getProfesores, addProfesor, altaClase, getProfesorById}
