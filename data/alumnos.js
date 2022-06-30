@@ -44,12 +44,12 @@ async function agregarAlumno(alumno){
     return result;
  }
 
- async function modificarAlumno(mail, alumno){
+ async function modificarAlumno(id, alumno){
     const clientmongo = await conn.getConnection();
     const result = await clientmongo
         .db(DATABASE)
         .collection(ALUMNOS)
-        .updateOne({mail: mail}, {$set: {nombre: alumno.nombre, apellido: alumno.apellido, 
+        .updateOne({_id: new objectId(id)}, {$set: {nombre: alumno.nombre, apellido: alumno.apellido, 
             dni:alumno.dni, telefono:alumno.telefono, nacimiento:alumno.nacimiento}})
     return result;
  }
@@ -60,6 +60,15 @@ async function agregarAlumno(alumno){
                         .db(DATABASE)
                         .collection(ALUMNOS)
                         .updateOne({_id: new ObjectId(idAlumno)}, {$set: {clases: clasesAlumno}});
+    return result;
+ }
+
+ async function cancelarClase(idClase, idAlumno, clasesModificadas){
+    const connectiondb = await conn.getConnection();
+    const result = await connectiondb
+                        .db(DATABASE)
+                        .collection(ALUMNOS)
+                        .updateOne({_id: new ObjectId(idAlumno)}, {$set: {clases: clasesModificadas}});
     return result;
  }
 
@@ -88,4 +97,4 @@ function generatedToken(alu){
 } 
 
 
-module.exports = {generatedToken, findByCredential, getAllAlumnos, agregarAlumno, eliminarAlumno, modificarAlumno, getAlumnoPorId, anotarseAClase}
+module.exports = {generatedToken, findByCredential, getAllAlumnos, agregarAlumno, eliminarAlumno, modificarAlumno, getAlumnoPorId, anotarseAClase, cancelarClase}

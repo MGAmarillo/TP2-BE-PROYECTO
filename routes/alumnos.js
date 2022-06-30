@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/alumnos');
 const data = require('./../data/alumnos');
+const auth = require('./../middlewares/Auth');
 
 /* GET users listing. */
 router.get('/', async(req, res) => {
@@ -9,7 +10,7 @@ router.get('/', async(req, res) => {
 })
 
 router.get('/:id', async(req, res) => {
-  res.json(await controller.getAlumnoPorId(req.params));
+  res.json(await controller.getAlumnoPorId(req.params.id));
 })
 
 router.post('/', async (req, res)=>{
@@ -17,12 +18,12 @@ router.post('/', async (req, res)=>{
   res.json(result);
 });
 
-router.delete('/:mail', async(req, res) => {
-  res.json(await controller.eliminarAlumno(req.params.mail));
+router.delete('/:id', async(req, res) => {
+  res.json(await controller.eliminarAlumno(req.params.id));
 })
 
-router.put('/:mail', async(req, res) => {
-  res.json(await controller.modificarAlumno(req.params.mail,req.body))
+router.put('/:id', async(req, res) => {
+  res.json(await controller.modificarAlumno(req.params.id,req.body))
 })
 
 router.post('/login', async (req,res) => {
@@ -37,6 +38,10 @@ router.post('/login', async (req,res) => {
 
 router.post('/anotarseClase/:idAlumno', async (req, res) => {
   res.json(await controller.anotarseAClase(req.body.clase_id, req.params.idAlumno));
+});
+
+router.post('/cancelarClase/:idAlumno', async (req, res) => {
+  res.json(await controller.cancelarClase(req.body.clase_id, req.params.idAlumno));
 });
 
 module.exports = router;

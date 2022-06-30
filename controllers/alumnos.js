@@ -1,6 +1,7 @@
 const dataAlumnos = require('../data/alumnos');
 const dataClases = require('../data/clases');
 const bcrypt = require('bcrypt')
+const objectId = require('mongodb').ObjectId;
 
 async function getAllAlumnos() {
     return dataAlumnos.getAllAlumnos();
@@ -19,8 +20,8 @@ async function agregarAlumno(alumno){
     
 }
 
-async function eliminarAlumno(mail){
-    let alumnoEncontrado = await getAlumnoPorMail(mail);
+async function eliminarAlumno(id){
+    let alumnoEncontrado = await getAlumnoPorId(id);
 
     if(alumnoEncontrado != undefined){
         return dataAlumnos.eliminarAlumno(alumnoEncontrado);
@@ -30,10 +31,10 @@ async function eliminarAlumno(mail){
     }
 }
 
-async function modificarAlumno(mail, alumno){
+async function modificarAlumno(id, alumno){
     let nacimiento = new Date(alumno.nacimiento);
     alumno.nacimiento = nacimiento;
-    return dataAlumnos.modificarAlumno(mail, alumno);
+    return dataAlumnos.modificarAlumno(id, alumno);
 }
 
 async function anotarseAClase(idClase, idAlumno){
@@ -45,8 +46,24 @@ async function anotarseAClase(idClase, idAlumno){
     const clas = await dataClases.getClasePorId(idClase);
     let alumnosPorClase = clas.alumnos;
     alumnosPorClase.push(idAlumno);
-    console.log(alumnosPorClase);
+    //console.log(alumnosPorClase);
     dataClases.registrarAlumno(idClase, idAlumno, alumnosPorClase);
 }
 
-module.exports = {getAllAlumnos, getAlumnoPorId, agregarAlumno, eliminarAlumno, modificarAlumno, anotarseAClase}
+async function cancelarClase(idClase, idAlumno){
+    const alu = await dataAlumnos.getAlumnoPorId(idAlumno);
+    const clasesAlumno = alu.clases;
+    //console.log(clasesAlumno);
+    const clasesModificadas = clasesAlumno.filter( c => c !== idClase);
+    dataAlumnos.cancelarClase(idClase, idAlumno, clasesModificadas);
+    //console.log(clasesModificadas);
+
+    const clas = await dataClases.getClasePorId(idClase);
+    const alumnosPorClase = clas.alumnos;
+    //console.log(alumnosPorClase);
+    const alumnosModificados = alumnosPorClase.filter( a => a !== idAlumno);
+    //console.log(alumnosModificados);
+    dataClases.eliminarAlumno(idClase, idAlumno, alumnosModificados);
+}
+
+module.exports = {getAllAlumnos, getAlumnoPorId, agregarAlumno, eliminarAlumno, modificarAlumno, anotarseAClase, cancelarClase}

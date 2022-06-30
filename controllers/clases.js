@@ -4,16 +4,12 @@ async function getClases() {
     return clases.getClases();
 }
 
-async function getClasesPorDeporte(deporte){
-    return clases.getClasesPorDeporte(deporte);
-}
-
-async function getClasesPorProfesor(profesor){
-    return clases.getClasesPorProfesor(profesor);
+async function getClasePorId(id){
+    return clases.getClasePorId(id);
 }
 
 async function addClase(clase){
     return clases.addClase(clase);
 }
 
-module.exports = {getClases, getClasesPorDeporte, getClasesPorProfesor, addClase}
+module.exports = {getClases, addClase, getClasePorId}

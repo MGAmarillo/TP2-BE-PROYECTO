@@ -25,18 +25,6 @@ async function getClasePorId(id){
     return clase;
 }
 
-async function getClasesPorDeporte(deporte){
-    const clases = await getClases();
-    const clasesPorDeporte = await clases.filter(c => c.deporte === deporte);
-    return clasesPorDeporte;
-}
-
-async function getClasesPorProfesor(profesor){
-    const clases = await getClases();
-    const clasesPorProfesor = await clases.filter(c => c.profesor === profesor);
-    return clasesPorProfesor;
-}
-
 async function addClase(clase){
     const connectiondb = await connection.getConnection();
     const clases = await  connectiondb
@@ -47,7 +35,6 @@ async function addClase(clase){
 }
 
 async function registrarAlumno(idClase, idAlumno, alumnosPorClase){
-    console.log(idClase);
     const connectiondb = await connection.getConnection();
     const result = await connectiondb
                         .db(DATABASE)
@@ -56,4 +43,13 @@ async function registrarAlumno(idClase, idAlumno, alumnosPorClase){
     return result;
 }
 
-module.exports = {getClases, getClasesPorDeporte, getClasesPorProfesor, addClase, getClasePorId, registrarAlumno}
+async function eliminarAlumno(idClase, idAlumno, alumnosModificados){
+    const connectiondb = await connection.getConnection();
+    const result = await connectiondb
+                        .db(DATABASE)
+                        .collection(CLASES)
+                        .updateOne({_id: new ObjectId(idClase)}, {$set: {alumnos: alumnosModificados}});
+    return result;
+}
+
+module.exports = {getClases, addClase, getClasePorId, registrarAlumno, eliminarAlumno}
