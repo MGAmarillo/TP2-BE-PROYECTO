@@ -1,69 +1,132 @@
-const dataAlumnos = require('../data/alumnos');
-const dataClases = require('../data/clases');
-const bcrypt = require('bcrypt')
-const objectId = require('mongodb').ObjectId;
+const alumnos = require('../data/alumnos');
+const clases = require('../data/clases');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const secret = process.env.SECRET;
 
 async function getAllAlumnos() {
-    return dataAlumnos.getAllAlumnos();
+    return alumnos.getAllAlumnos();
 }
 
-async function getAlumnoPorId(id){
-    return dataAlumnos.getAlumnoPorId(id);
-}
-
-async function agregarAlumno(alumno){
-    let password = await bcrypt.hash(alumno.password,10);
-    let nacimiento = new Date(alumno.nacimiento);
-    alumno.password = password;
-    alumno.nacimiento = nacimiento;
-    return dataAlumnos.agregarAlumno(alumno);
+async function getAlumnoPorMail(mail){
+    let alumnos = await getAllAlumnos();
+    let alumnoEncontrado = alumnos.find(alumno => alumno.mail == mail);
+    if(alumnoEncontrado == undefined){
+        return "El alumno no fue encontrado";
+    }
+    else{
+        return alumnoEncontrado
+    }
     
 }
 
-async function eliminarAlumno(id){
-    let alumnoEncontrado = await getAlumnoPorId(id);
-
+async function agregarAlumno(alumno){
+    
+    let allAlumnos = await getAllAlumnos();
+    let alumnoEncontrado = allAlumnos.find(auxAlumno=>auxAlumno.mail==alumno.mail);
+    
     if(alumnoEncontrado != undefined){
-        return dataAlumnos.eliminarAlumno(alumnoEncontrado);
+        return "El mail ingresado ya existe.";
     }
     else{
-        console.log("El alumno a eliminar, no ha sido encontrado")
+        let password = await bcrypt.hash(alumno.password,10);
+        alumno.password = password;
+        return alumnos.agregarAlumno(alumno);
+    }
+
+    
+    
+}
+
+async function eliminarAlumno(mail){
+    let allAlumnos = await getAllAlumnos();
+    let alumnoEncontrado = allAlumnos.find(auxAlumno=>auxAlumno.mail==mail);
+
+    if(alumnoEncontrado != undefined){
+        return alumnos.eliminarAlumno(alumnoEncontrado);
+    }
+    else{
+        return "El alumno ha eliminar, no ha sido encontrado."
     }
 }
 
-async function modificarAlumno(id, alumno){
-    let nacimiento = new Date(alumno.nacimiento);
-    alumno.nacimiento = nacimiento;
-    return dataAlumnos.modificarAlumno(id, alumno);
+async function modificarAlumno(mail, alumno){
+    let allAlumnos = await getAllAlumnos();
+    let alumnoEncontrado = allAlumnos.find(auxAlumno=>auxAlumno.mail==mail);
+
+    if(alumnoEncontrado != undefined){
+        alumno.nombre = alumnoEncontrado.nombre;
+        alumno.apellido = alumnoEncontrado.apellido;
+        alumno.mail = alumnoEncontrado.mail;
+        alumno.dni = alumnoEncontrado.dni;
+        alumno.password = alumnoEncontrado.password;
+    }
+    else{
+        return "El alumno ha modificar, no ha sido encontrado."
+    }
+
+    
+    return alumnos.modificarAlumno(mail, alumno);
 }
 
-async function anotarseAClase(idClase, idAlumno){
-    const alu = await dataAlumnos.getAlumnoPorId(idAlumno);
-    let clasesAlumno = alu.clases;
-    clasesAlumno.push(idClase);
-    dataAlumnos.anotarseAClase(idClase, idAlumno, clasesAlumno);
+async function anotarseEnClase(mail,id){
+   let allAlumnos = await getAllAlumnos();
+   let alumnoEncontrado = allAlumnos.find(alumnoAux => alumnoAux.mail == mail); 
 
-    const clas = await dataClases.getClasePorId(idClase);
-    let alumnosPorClase = clas.alumnos;
-    alumnosPorClase.push(idAlumno);
-    //console.log(alumnosPorClase);
-    dataClases.registrarAlumno(idClase, idAlumno, alumnosPorClase);
+   let allClases = await clases.getClases();
+   let claseEncontrada = allClases.find(claseAux => claseAux._id == id);
+
+   if(claseEncontrada != undefined && alumnoEncontrado!=undefined){
+    await clases.agregarAlumno(claseEncontrada,alumnoEncontrado);
+    return alumnos.anotarseEnClase(mail, claseEncontrada);
+   }
+   else{
+    return "el alumno o la clase no fueron encontrados";
+   }
 }
 
-async function cancelarClase(idClase, idAlumno){
-    const alu = await dataAlumnos.getAlumnoPorId(idAlumno);
-    const clasesAlumno = alu.clases;
-    //console.log(clasesAlumno);
-    const clasesModificadas = clasesAlumno.filter( c => c !== idClase);
-    dataAlumnos.cancelarClase(idClase, idAlumno, clasesModificadas);
-    //console.log(clasesModificadas);
+async function cancelarClase(mail,id){
+    let allAlumnos = await getAllAlumnos();
+    let alumnoEncontrado = allAlumnos.find(alumnoAux => alumnoAux.mail == mail);
 
-    const clas = await dataClases.getClasePorId(idClase);
-    const alumnosPorClase = clas.alumnos;
-    //console.log(alumnosPorClase);
-    const alumnosModificados = alumnosPorClase.filter( a => a !== idAlumno);
-    //console.log(alumnosModificados);
-    dataClases.eliminarAlumno(idClase, idAlumno, alumnosModificados);
+    let allClases = await clases.getClases();
+    let claseEncontrada = allClases.find(claseAux => claseAux._id == id);
+
+    if(claseEncontrada!=undefined && alumnoEncontrado!=undefined){
+        await clases.retirarAlumnoDeClase(claseEncontrada._id,alumnoEncontrado._id)
+        return alumnos.quitarClase(alumnoEncontrado,id);
+    }
+    else{
+        return "La clase o el alumno no fueron encontrados."
+    }
 }
 
-module.exports = {getAllAlumnos, getAlumnoPorId, agregarAlumno, eliminarAlumno, modificarAlumno, anotarseAClase, cancelarClase}
+async function login(mail,password){
+    let allAlumnos = await getAllAlumnos();
+    let alumnoEncontrado = allAlumnos.find(alumnoAux => alumnoAux.mail == mail);
+
+    let storedPassword = alumnoEncontrado.password;
+
+    let isPasswordValid = await bcrypt.compare(password, storedPassword);
+
+    if(isPasswordValid && alumnoEncontrado!=undefined){
+        const token = jwt.sign({
+            storedPassword,
+            mail,
+            exp: Date.now() + 60 * 1000
+        }, secret);
+        return token;
+    }
+    else{
+        return "La contraseña o el usuario no son correctos."
+    }
+
+}
+
+
+
+
+
+
+module.exports = {getAllAlumnos, getAlumnoPorMail, agregarAlumno, eliminarAlumno, modificarAlumno, anotarseEnClase, cancelarClase, login}

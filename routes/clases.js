@@ -6,8 +6,12 @@ router.get('/', async (req, res) => {
     res.json(await controller.getClases());
 });
 
-router.get('/:id', async(req, res) => {
-    res.json(await controller.getClasePorId(req.params));
+router.get('/porDeporte/:deporte', async (req, res) => {
+    res.json(await controller.getClasesPorDeporte(req.params));
+});
+
+router.get('/porProfesor/:nombre/:apellido', async (req, res) => {
+    res.json(await controller.getClasesPorProfesor(req.params.nombre, req.params.apellido));
 });
 
 router.post('/', async (req, res) => {
