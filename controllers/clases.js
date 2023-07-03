@@ -1,15 +1,17 @@
 const clases = require('../data/clases');
+const profesores = require('../data/profesores');
 
 async function getClases() {
     return clases.getClases();
 }
 
 async function getClasesPorDeporte(deporte){
-    return clases.getClasesPorDeporte(deporte);
+    let clasesFiltradas = await clases.getClasesPorDeporte(deporte);
+    return clasesFiltradas;
 }
 
-async function getClasesPorProfesor(profesor){
-    return clases.getClasesPorProfesor(profesor);
+async function getClasesPorProfesor(nombre,apellido){
+    return clases.getClasesPorProfesor(nombre,apellido);
 }
 
 async function addClase(clase){

@@ -17,35 +17,53 @@ async function getProfesores(){
     return profes;
 }
 
-async function getProfesorById(profesorId) {
-    const connectiondb = await conn.getConnection();
-    const query = {_id: new objectId(profesorId)};
-    const profesor = await connectiondb
-                        .db(DATABASE)
-                        .collection(PROFESORES)
-                        .find(query)
-                        .toArray();
-     return profesor;
-}
 async function addProfesor(profesor){
     const connectiondb = await connection.getConnection();
-    profesor.password = await bcrypt.hash(profesor.password, 8);
-    const users = await  connectiondb
+    const result = await  connectiondb
                             .db(DATABASE)
                             .collection(PROFESORES)
                             .insertOne(profesor);
-    return profesor;
+    return result;
 }
 
-async function altaClase(clase){
-    const connectiondb = await connection.getConnection();
-    const profes = await connectiondb
-                            .db(DATABASE)
-                            .collection(PROFESORES)
-    
-}
+async function eliminarProfesor(profesor){
+    const clientmongo = await connection.getConnection();
+    const result = await clientmongo
+        .db(DATABASE)
+        .collection(PROFESORES)
+        .deleteOne(profesor)
+    return result;
+ }
 
-async function findByCredential(mail, password){
+ async function updateProfesor(mail, profesor){
+    const clientmongo = await connection.getConnection();
+    const result = await clientmongo
+        .db(DATABASE)
+        .collection(PROFESORES)
+        .updateOne({mail: mail}, {$set: {nombre: profesor.nombre, apellido: profesor.apellido,
+            dni:profesor.dni, telefono:profesor.telefono, nacimiento:profesor.nacimiento}})
+    return result;
+ }
+
+ async function agregarClase(mail,clase){
+    clase._id = objectId(clase._id)
+    const clientmongo = await connection.getConnection();
+    const result = await clientmongo
+        .db(DATABASE)
+        .collection(PROFESORES)
+        .updateOne({mail:mail},{$push:{clases: clase}})
+ }
+
+ async function quitarClase(mail, id){
+    const clientmongo = await connection.getConnection();
+    const result = await clientmongo
+        .db(DATABASE)
+        .collection(PROFESORES)
+        .updateOne({ mail:mail }, { $pull: { clases: { _id: objectId(id) } } });
+ }
+
+
+ async function findByCredential(mail, password){
     const connectiondb = await connection.getConnection();
     const prof = await  connectiondb
                             .db(DATABASE)
@@ -69,5 +87,5 @@ function generatedToken(prof){
     return token;
 }
 
-module.exports = {addProfesor, findByCredential, generatedToken, getProfesores, getProfesorById}
+module.exports = {addProfesor, findByCredential, generatedToken, getProfesores, eliminarProfesor, updateProfesor,agregarClase, quitarClase}
 

@@ -1,12 +1,11 @@
 var createError = require('http-errors');
 var express = require('express');
-var cors = require('cors');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var dotenv = require("dotenv").config();
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 const deportesRouter = require('./routes/deportes');
 const clasesRouter = require('./routes/clases')
 const profesoresRouter = require('./routes/profesores')
@@ -27,8 +26,6 @@ const corsOptions = {
   }
 }
 
-app.use(cors(corsOptions));
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -40,7 +37,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/api/users', usersRouter);
 app.use('/api/deportes', deportesRouter);
 app.use('/api/clases', clasesRouter);
 app.use('/api/profesores', profesoresRouter)
